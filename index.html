@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Steal a BFDI Character - 3D Multiplayer Prototype</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <section class="hud">
+      <h1>Steal a BFDI Character (Local 2-Player 3D)</h1>
+      <p class="sub">BFDI characters spawn from the tunnel and walk down the runway.</p>
+      <div class="stats">
+        <div><span>Blue Base</span><strong id="scoreBlue">0</strong></div>
+        <div><span>Orange Base</span><strong id="scoreOrange">0</strong></div>
+        <div><span>Blue Carrying</span><strong id="carryBlue">None</strong></div>
+        <div><span>Orange Carrying</span><strong id="carryOrange">None</strong></div>
+      </div>
+      <div class="controls">
+        <strong>Blue:</strong><span>Move WASD</span><span>Grab/Drop E</span>
+        <strong>Orange:</strong><span>Move Arrows</span><span>Grab/Drop M</span>
+      </div>
+      <p id="eventLog">Collect runway characters and bring them to your base. You can steal from the enemy base.</p>
+    </section>
+
+    <canvas id="gameCanvas"></canvas>
+    <script type="module" src="script.js"></script>
+  </body>
+</html>
