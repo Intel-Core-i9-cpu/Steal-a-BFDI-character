@@ -1,0 +1,138 @@
+:root {
+  --bg: #12172b;
+  --panel: #1a2040;
+  --accent: #ffdb6e;
+  --text: #f3f4ff;
+  --muted: #a8afcf;
+  --danger: #ff7b8f;
+  --good: #6aff9d;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  color: var(--text);
+  background: radial-gradient(circle at top, #263066, var(--bg));
+  padding: 1.25rem;
+}
+
+header {
+  text-align: center;
+  margin-bottom: 1.2rem;
+}
+
+header h1 {
+  margin: 0;
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+}
+
+header p {
+  margin: 0.5rem 0 0;
+  color: var(--muted);
+}
+
+.layout {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+.panel {
+  background: color-mix(in srgb, var(--panel), black 8%);
+  border: 1px solid color-mix(in srgb, var(--accent), transparent 75%);
+  border-radius: 14px;
+  padding: 1rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+}
+
+h2 {
+  margin-top: 0;
+  font-size: 1.1rem;
+}
+
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.35rem 0;
+  border-bottom: 1px dashed color-mix(in srgb, var(--muted), transparent 60%);
+}
+
+button {
+  width: 100%;
+  border: none;
+  border-radius: 10px;
+  padding: 0.75rem;
+  margin-bottom: 0.6rem;
+  font-weight: 700;
+  color: #231a00;
+  background: var(--accent);
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.event-log {
+  min-height: 3.5rem;
+  color: var(--muted);
+}
+
+.character-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.character-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: color-mix(in srgb, var(--panel), white 6%);
+  border: 1px solid color-mix(in srgb, var(--muted), transparent 75%);
+  border-radius: 10px;
+  padding: 0.65rem;
+}
+
+.character-card h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.character-card p {
+  margin: 0.2rem 0 0;
+  color: var(--muted);
+  font-size: 0.87rem;
+}
+
+.rarity-common {
+  color: #d9d9e9;
+}
+
+.rarity-rare {
+  color: #8ad7ff;
+}
+
+.rarity-epic {
+  color: #d29bff;
+}
+
+.rarity-legendary {
+  color: #ffbe66;
+}
+
+.log-good {
+  color: var(--good);
+}
+
+.log-bad {
+  color: var(--danger);
+}
