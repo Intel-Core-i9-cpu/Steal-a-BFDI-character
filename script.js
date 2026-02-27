@@ -26,8 +26,7 @@ const state = {
   blue: { team: "blue", pos: new THREE.Vector3(-11, 0.9, 11), carry: null },
   orange: { team: "orange", pos: new THREE.Vector3(11, 0.9, 11), carry: null },
   characters: [],
-  nextSpawnAt: 0,
-  lastEventAt: 0
+  nextSpawnAt: 0
 };
 
 const keys = new Set();
@@ -63,7 +62,6 @@ function weightedPick() {
 
 function setLog(msg) {
   nodes.eventLog.textContent = msg;
-  state.lastEventAt = performance.now();
 }
 
 function createLabelSprite(text, width = 460, height = 126, fontSize = 42) {
@@ -214,6 +212,10 @@ function attemptGrabOrDrop(player) {
 }
 
 window.addEventListener("keydown", (event) => {
+  if (event.repeat) {
+    return;
+  }
+
   keys.add(event.code);
   if (event.code === "KeyE") attemptGrabOrDrop(state.blue);
   if (event.code === "KeyM") attemptGrabOrDrop(state.orange);
