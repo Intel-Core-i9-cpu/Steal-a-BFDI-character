@@ -33,3 +33,6 @@ curl -I http://127.0.0.1:8000
 
 ## Merge notes
 - Current HUD exposes a build tag (`conflict-safe-v2`) so you can quickly verify this branch's conflict-resolved payload is what got merged.
+
+## Conflict mitigation
+- Added `.gitattributes` merge rules for `index.html`, `styles.css`, `script.js`, and `README.md` using `merge=ours` so future merges prefer the current branch's resolved versions for these frequently-conflicting prototype files.
