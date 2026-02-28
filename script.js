@@ -6,7 +6,8 @@ const nodes = {
   scoreOrange: document.getElementById("scoreOrange"),
   carryBlue: document.getElementById("carryBlue"),
   carryOrange: document.getElementById("carryOrange"),
-  eventLog: document.getElementById("eventLog")
+  eventLog: document.getElementById("eventLog"),
+  buildTag: document.getElementById("buildTag")
 };
 
 const CHARACTER_POOL = [
@@ -36,6 +37,9 @@ const state = {
 };
 
 const keys = new Set();
+
+const BUILD_VERSION = "conflict-safe-v2";
+
 
 function setLog(message) {
   nodes.eventLog.textContent = message;
@@ -267,5 +271,8 @@ window.addEventListener("keyup", (event) => keys.delete(event.code));
 resize();
 spawnCharacter();
 spawnCharacter();
+if (nodes.buildTag) {
+  nodes.buildTag.textContent = `Build: ${BUILD_VERSION}`;
+}
 setLog("Working build loaded: grab runway characters, bank at base, steal from enemy base.");
 requestAnimationFrame(tick);
