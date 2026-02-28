@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
+
     <aside class="hud">
       <h1>Steal a BFDI Character</h1>
       <p class="subtitle">Local 2-player prototype: runway spawn, grab, bank, and steal.</p>
@@ -25,6 +26,49 @@
     </aside>
 
     <canvas id="game"></canvas>
+=======
+    <header>
+      <h1>Steal a BFDI Character</h1>
+      <p>Build your collection, earn cash, and swipe from your rival.</p>
+    </header>
+
+    <main class="layout">
+      <section class="panel stats">
+        <h2>Player Stats</h2>
+        <div class="stat-row"><span>Cash</span><strong id="cash">$0</strong></div>
+        <div class="stat-row"><span>Income / sec</span><strong id="income">$0</strong></div>
+        <div class="stat-row"><span>Steal Success Rate</span><strong id="stealRate">0%</strong></div>
+      </section>
+
+      <section class="panel actions">
+        <h2>Actions</h2>
+        <button id="rollBtn">Roll Character ($50)</button>
+        <button id="stealBtn">Attempt Steal</button>
+        <p id="eventLog" class="event-log">Welcome! Roll your first BFDI character.</p>
+      </section>
+
+      <section class="panel roster">
+        <h2>Your Team</h2>
+        <ul id="playerRoster" class="character-list"></ul>
+      </section>
+
+      <section class="panel roster rival">
+        <h2>Rival Team</h2>
+        <ul id="rivalRoster" class="character-list"></ul>
+      </section>
+    </main>
+
+    <template id="characterTemplate">
+      <li class="character-card">
+        <div>
+          <h3 class="character-name"></h3>
+          <p class="character-rarity"></p>
+        </div>
+        <strong class="character-income"></strong>
+      </li>
+    </template>
+
+
     <script src="script.js"></script>
   </body>
 </html>
