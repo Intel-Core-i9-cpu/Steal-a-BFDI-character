@@ -1,6 +1,0 @@
-# Reduce repeated PR conflicts on the prototype surface files by
-# favoring the incoming branch version during merges.
-index.html merge=ours
-styles.css merge=ours
-script.js merge=ours
-README.md merge=ours
