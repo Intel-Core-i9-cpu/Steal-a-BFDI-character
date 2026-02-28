@@ -1,9 +1,9 @@
 # Steal-a-BFDI-character
 
-A **3D local multiplayer starter prototype** inspired by Steal a Brainrot, where **those BFDI characters** spawn from a tunnel and walk a runway.
+A **3D-style local multiplayer starter prototype** inspired by Steal a Brainrot, where **those BFDI characters** spawn from a tunnel and walk a runway.
 
 ## What's implemented
-- Three.js 3D arena with tunnel, runway, and two bases.
+- Canvas-rendered pseudo-3D arena with tunnel, runway, and two bases (no external JS dependencies).
 - BFDI characters continuously spawn from the tunnel and walk the runway.
 - Floating stat labels above each character (`SPD` and `VAL`).
 - Local 2-player controls on one screen (blue vs orange).

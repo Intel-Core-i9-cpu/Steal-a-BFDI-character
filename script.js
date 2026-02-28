@@ -1,17 +1,5 @@
-import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.module.js";
-
-const CHARACTER_POOL = [
-  { name: "Leafy", speed: 5, value: 1, weight: 20, color: 0x6dff8f },
-  { name: "Firey", speed: 6, value: 2, weight: 18, color: 0xff7a40 },
-  { name: "Bubble", speed: 7, value: 1, weight: 18, color: 0x88deff },
-  { name: "Coiny", speed: 5, value: 2, weight: 14, color: 0xffcd5b },
-  { name: "Pin", speed: 6, value: 3, weight: 11, color: 0xff68d1 },
-  { name: "Tennis Ball", speed: 6, value: 2, weight: 8, color: 0xd0ff63 },
-  { name: "Flower", speed: 8, value: 3, weight: 6, color: 0xf57bff },
-  { name: "Gelatin", speed: 7, value: 4, weight: 3, color: 0xa088ff },
-  { name: "Four", speed: 9, value: 5, weight: 1.5, color: 0x5e4aff },
-  { name: "X", speed: 10, value: 5, weight: 0.5, color: 0xfff466 }
-];
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
 
 const nodes = {
   scoreBlue: document.getElementById("scoreBlue"),
@@ -21,145 +9,69 @@ const nodes = {
   eventLog: document.getElementById("eventLog")
 };
 
+const CHARACTER_POOL = [
+  { name: "Leafy", speed: 0.65, value: 1, weight: 20, color: "#6dff8f" },
+  { name: "Firey", speed: 0.8, value: 2, weight: 18, color: "#ff7a40" },
+  { name: "Bubble", speed: 0.92, value: 1, weight: 18, color: "#88deff" },
+  { name: "Coiny", speed: 0.68, value: 2, weight: 14, color: "#ffcd5b" },
+  { name: "Pin", speed: 0.78, value: 3, weight: 11, color: "#ff68d1" },
+  { name: "Tennis Ball", speed: 0.76, value: 2, weight: 8, color: "#d0ff63" },
+  { name: "Flower", speed: 1.0, value: 3, weight: 6, color: "#f57bff" },
+  { name: "Gelatin", speed: 0.9, value: 4, weight: 3, color: "#a088ff" },
+  { name: "Four", speed: 1.1, value: 5, weight: 1.5, color: "#5e4aff" },
+  { name: "X", speed: 1.2, value: 5, weight: 0.5, color: "#fff466" }
+];
+
+const CONTROL_MAP = {
+  blue: { left: ["KeyA"], right: ["KeyD"], up: ["KeyW"], down: ["KeyS"], action: "KeyE" },
+  orange: { left: ["ArrowLeft"], right: ["ArrowRight"], up: ["ArrowUp"], down: ["ArrowDown"], action: "KeyM" }
+};
+
 const state = {
   scores: { blue: 0, orange: 0 },
-  blue: { team: "blue", pos: new THREE.Vector3(-11, 0.9, 11), carry: null },
-  orange: { team: "orange", pos: new THREE.Vector3(11, 0.9, 11), carry: null },
+  blue: { team: "blue", pos: { x: -11, z: 11 }, carry: null },
+  orange: { team: "orange", pos: { x: 11, z: 11 }, carry: null },
   characters: [],
   nextSpawnAt: 0
 };
 
 const keys = new Set();
 
-const CONTROL_MAP = {
-  blue: { left: ["KeyA"], right: ["KeyD"], up: ["KeyW"], down: ["KeyS"], action: "KeyE" },
-  orange: { left: ["ArrowLeft"], right: ["ArrowRight"], up: ["ArrowUp"], down: ["ArrowDown"], action: "KeyM" }
-};
-const canvas = document.getElementById("gameCanvas");
-const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.shadowMap.enabled = true;
-
-const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x0a1020);
-scene.fog = new THREE.Fog(0x0a1020, 22, 66);
-
-const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 180);
-camera.position.set(0, 24, 24);
-camera.lookAt(0, 0, -4);
-
-scene.add(new THREE.HemisphereLight(0x8fabff, 0x1a1730, 1.2));
-const sun = new THREE.DirectionalLight(0xffffff, 1.05);
-sun.position.set(8, 18, 5);
-sun.castShadow = true;
-scene.add(sun);
+function setLog(message) {
+  nodes.eventLog.textContent = message;
+}
 
 function weightedPick() {
-  const total = CHARACTER_POOL.reduce((sum, item) => sum + item.weight, 0);
+  const total = CHARACTER_POOL.reduce((sum, c) => sum + c.weight, 0);
   let rng = Math.random() * total;
-  for (const item of CHARACTER_POOL) {
-    rng -= item.weight;
-    if (rng <= 0) return item;
+  for (const c of CHARACTER_POOL) {
+    rng -= c.weight;
+    if (rng <= 0) return c;
   }
   return CHARACTER_POOL[0];
 }
 
-function setLog(msg) {
-  nodes.eventLog.textContent = msg;
-}
-
-function createLabelSprite(text, width = 460, height = 126, fontSize = 42) {
-  const cvs = document.createElement("canvas");
-  cvs.width = width;
-  cvs.height = height;
-  const ctx = cvs.getContext("2d");
-  ctx.fillStyle = "rgba(6, 9, 20, 0.75)";
-  ctx.fillRect(0, 0, width, height);
-  ctx.strokeStyle = "rgba(180,200,255,0.8)";
-  ctx.lineWidth = 6;
-  ctx.strokeRect(3, 3, width - 6, height - 6);
-  ctx.fillStyle = "#eef3ff";
-  ctx.font = `bold ${fontSize}px sans-serif`;
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-  ctx.fillText(text, width / 2, height / 2);
-  const texture = new THREE.CanvasTexture(cvs);
-  const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: texture, depthTest: false }));
-  sprite.scale.set(3.4, 0.9, 1);
-  return sprite;
-}
-
-function makeWorld() {
-  const ground = new THREE.Mesh(new THREE.PlaneGeometry(120, 120), new THREE.MeshStandardMaterial({ color: 0x131a30, roughness: 0.95 }));
-  ground.rotation.x = -Math.PI / 2;
-  ground.receiveShadow = true;
-  scene.add(ground);
-
-  const runway = new THREE.Mesh(new THREE.PlaneGeometry(7.5, 48), new THREE.MeshStandardMaterial({ color: 0x2b3155, roughness: 0.9, metalness: 0.05 }));
-  runway.position.set(0, 0.01, -2);
-  runway.rotation.x = -Math.PI / 2;
-  scene.add(runway);
-
-  const tunnel = new THREE.Mesh(
-    new THREE.CylinderGeometry(3.2, 3.2, 7.6, 26, 1, true, 0, Math.PI),
-    new THREE.MeshStandardMaterial({ color: 0x3e4264, side: THREE.DoubleSide })
-  );
-  tunnel.rotation.z = Math.PI / 2;
-  tunnel.position.set(0, 2.2, -25);
-  scene.add(tunnel);
-
-  addBase("blue", new THREE.Vector3(-11, 0.2, 11), 0x4e7cff);
-  addBase("orange", new THREE.Vector3(11, 0.2, 11), 0xff9f4f);
-}
-
-function addBase(name, position, color) {
-  const pad = new THREE.Mesh(new THREE.CylinderGeometry(4.1, 4.1, 0.4, 40), new THREE.MeshStandardMaterial({ color }));
-  pad.position.copy(position);
-  scene.add(pad);
-
-  const text = createLabelSprite(`${name.toUpperCase()} BASE`, 360, 110, 34);
-  text.position.set(position.x, 3.3, position.z + 3.5);
-  scene.add(text);
-}
-
-function createPlayerMesh(team) {
-  const body = new THREE.Mesh(
-    new THREE.CapsuleGeometry(0.5, 0.65, 8, 14),
-    new THREE.MeshStandardMaterial({ color: team === "blue" ? 0x5f83ff : 0xffa44a })
-  );
-  body.castShadow = true;
-  scene.add(body);
-  return body;
-}
-
-const playerMeshes = {
-  blue: createPlayerMesh("blue"),
-  orange: createPlayerMesh("orange")
-};
-
 function spawnCharacter() {
   const seed = weightedPick();
-  const mesh = new THREE.Mesh(new THREE.SphereGeometry(0.45, 24, 24), new THREE.MeshStandardMaterial({ color: seed.color }));
-  mesh.castShadow = true;
-  scene.add(mesh);
-
-  const label = createLabelSprite(`${seed.name} SPD:${seed.speed} VAL:${seed.value}`);
-  scene.add(label);
-
   state.characters.push({
     id: Math.random().toString(36).slice(2, 9),
     ...seed,
-    pos: new THREE.Vector3((Math.random() - 0.5) * 2.8, 0.7, -24),
+    pos: { x: (Math.random() - 0.5) * 2.8, z: -24 },
     carrier: null,
-    storedAt: null,
-    mesh,
-    label
+    storedAt: null
   });
 }
 
+function clamp(v, min, max) {
+  return Math.max(min, Math.min(max, v));
+}
+
+function dist(a, b) {
+  return Math.hypot(a.x - b.x, a.z - b.z);
+}
+
 function basePos(team) {
-  return team === "blue" ? new THREE.Vector3(-11, 0, 11) : new THREE.Vector3(11, 0, 11);
+  return team === "blue" ? { x: -11, z: 11 } : { x: 11, z: 11 };
 }
 
 function handlePlayerMovement(player, controls, speed) {
@@ -171,8 +83,8 @@ function handlePlayerMovement(player, controls, speed) {
   if (controls.down.some((k) => keys.has(k))) dz += 1;
 
   const len = Math.hypot(dx, dz) || 1;
-  player.pos.x = THREE.MathUtils.clamp(player.pos.x + (dx / len) * speed, -18, 18);
-  player.pos.z = THREE.MathUtils.clamp(player.pos.z + (dz / len) * speed, -30, 18);
+  player.pos.x = clamp(player.pos.x + (dx / len) * speed, -18, 18);
+  player.pos.z = clamp(player.pos.z + (dz / len) * speed, -30, 18);
 }
 
 function attemptGrabOrDrop(player) {
@@ -180,11 +92,11 @@ function attemptGrabOrDrop(player) {
     const carried = state.characters.find((c) => c.id === player.carry);
     if (!carried) return;
 
-    const homeBase = basePos(player.team);
-    if (player.pos.distanceTo(homeBase) < 4.2) {
+    const home = basePos(player.team);
+    if (dist(player.pos, home) < 4.2) {
       carried.carrier = null;
       carried.storedAt = player.team;
-      carried.pos.copy(homeBase).add(new THREE.Vector3((Math.random() - 0.5) * 2, 0.7, (Math.random() - 0.5) * 2));
+      carried.pos = { x: home.x + (Math.random() - 0.5) * 2, z: home.z + (Math.random() - 0.5) * 2 };
       player.carry = null;
       state.scores[player.team] += carried.value;
       setLog(`${player.team.toUpperCase()} scored ${carried.name} (+${carried.value})`);
@@ -192,23 +104,23 @@ function attemptGrabOrDrop(player) {
     }
 
     carried.carrier = null;
-    carried.pos.copy(player.pos).add(new THREE.Vector3(0.6, -0.2, 0.6));
+    carried.pos = { x: player.pos.x + 0.6, z: player.pos.z + 0.6 };
     player.carry = null;
     setLog(`${player.team.toUpperCase()} dropped ${carried.name}`);
     return;
   }
 
   const enemy = player.team === "blue" ? "orange" : "blue";
-  const enemyStored = state.characters.find((c) => c.storedAt === enemy && player.pos.distanceTo(c.pos) < 4.2);
-  if (enemyStored) {
-    enemyStored.storedAt = null;
-    enemyStored.carrier = player.team;
-    player.carry = enemyStored.id;
-    setLog(`${player.team.toUpperCase()} stole ${enemyStored.name} from ${enemy.toUpperCase()} base!`);
+  const stealable = state.characters.find((c) => c.storedAt === enemy && dist(player.pos, c.pos) < 4.2);
+  if (stealable) {
+    stealable.storedAt = null;
+    stealable.carrier = player.team;
+    player.carry = stealable.id;
+    setLog(`${player.team.toUpperCase()} stole ${stealable.name} from ${enemy.toUpperCase()} base!`);
     return;
   }
 
-  const free = state.characters.find((c) => !c.carrier && !c.storedAt && player.pos.distanceTo(c.pos) < 2.1);
+  const free = state.characters.find((c) => !c.carrier && !c.storedAt && dist(player.pos, c.pos) < 2.1);
   if (free) {
     free.carrier = player.team;
     player.carry = free.id;
@@ -216,23 +128,82 @@ function attemptGrabOrDrop(player) {
   }
 }
 
-window.addEventListener("keydown", (event) => {
-  if (event.repeat) {
-    return;
-  }
+function toScreen(pos) {
+  const runwayTop = 120;
+  const runwayBottom = canvas.height - 80;
+  const zNorm = (pos.z + 30) / 48;
+  const y = runwayTop + zNorm * (runwayBottom - runwayTop);
+  const widthNear = canvas.width * 0.62;
+  const widthFar = canvas.width * 0.14;
+  const currentWidth = widthFar + zNorm * (widthNear - widthFar);
+  const x = canvas.width / 2 + (pos.x / 18) * (currentWidth / 2);
+  const scale = 0.45 + zNorm * 1.1;
+  return { x, y, scale, zNorm };
+}
 
-  keys.add(event.code);
-  if (event.code === CONTROL_MAP.blue.action) attemptGrabOrDrop(state.blue);
-  if (event.code === CONTROL_MAP.orange.action) attemptGrabOrDrop(state.orange);
-});
+function drawWorld() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-window.addEventListener("keyup", (event) => keys.delete(event.code));
+  const sky = ctx.createLinearGradient(0, 0, 0, canvas.height);
+  sky.addColorStop(0, "#1a2758");
+  sky.addColorStop(1, "#080c1a");
+  ctx.fillStyle = sky;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-window.addEventListener("resize", () => {
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
-});
+  const runwayTopY = 120;
+  const runwayBottomY = canvas.height - 80;
+  ctx.fillStyle = "#2b3155";
+  ctx.beginPath();
+  ctx.moveTo(canvas.width * 0.43, runwayTopY);
+  ctx.lineTo(canvas.width * 0.57, runwayTopY);
+  ctx.lineTo(canvas.width * 0.81, runwayBottomY);
+  ctx.lineTo(canvas.width * 0.19, runwayBottomY);
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.fillStyle = "#3e4264";
+  ctx.beginPath();
+  ctx.ellipse(canvas.width / 2, 90, 90, 42, 0, Math.PI, 2 * Math.PI);
+  ctx.fill();
+
+  drawBase("blue", "#4e7cff", basePos("blue"));
+  drawBase("orange", "#ff9f4f", basePos("orange"));
+}
+
+function drawBase(team, color, worldPos) {
+  const p = toScreen(worldPos);
+  ctx.fillStyle = color;
+  ctx.globalAlpha = 0.85;
+  ctx.beginPath();
+  ctx.ellipse(p.x, p.y, 55 * p.scale, 20 * p.scale, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.globalAlpha = 1;
+  ctx.fillStyle = "#eef3ff";
+  ctx.font = `${Math.round(16 * p.scale)}px sans-serif`;
+  ctx.textAlign = "center";
+  ctx.fillText(`${team.toUpperCase()} BASE`, p.x, p.y - 24 * p.scale);
+}
+
+function drawPlayer(player, color) {
+  const p = toScreen(player.pos);
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.arc(p.x, p.y - 16 * p.scale, 12 * p.scale, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+function drawCharacter(character) {
+  const p = toScreen(character.pos);
+  ctx.fillStyle = character.color;
+  ctx.beginPath();
+  ctx.arc(p.x, p.y - 10 * p.scale, 10 * p.scale, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.fillStyle = "#eef3ff";
+  ctx.font = `${Math.max(10, Math.round(12 * p.scale))}px sans-serif`;
+  ctx.textAlign = "center";
+  ctx.fillText(`${character.name} SPD:${Math.round(character.speed * 10)} VAL:${character.value}`, p.x, p.y - 26 * p.scale);
+}
 
 function tick(now) {
   requestAnimationFrame(tick);
@@ -245,42 +216,56 @@ function tick(now) {
   handlePlayerMovement(state.blue, CONTROL_MAP.blue, 0.2);
   handlePlayerMovement(state.orange, CONTROL_MAP.orange, 0.2);
 
-  for (const character of state.characters) {
-    if (character.carrier) {
-      const player = state[character.carrier];
-      character.pos.copy(player.pos).add(new THREE.Vector3(0, 0, -1));
-      character.storedAt = null;
-    } else if (!character.storedAt) {
-      character.pos.z += 0.03 * character.speed;
-      if (character.pos.z > 19) {
-        character.pos.z = -24;
-        character.pos.x = (Math.random() - 0.5) * 2.8;
+  for (const c of state.characters) {
+    if (c.carrier) {
+      const player = state[c.carrier];
+      c.pos.x = player.pos.x;
+      c.pos.z = player.pos.z - 1;
+      c.storedAt = null;
+    } else if (!c.storedAt) {
+      c.pos.z += 0.03 * c.speed * 10;
+      if (c.pos.z > 19) {
+        c.pos.z = -24;
+        c.pos.x = (Math.random() - 0.5) * 2.8;
       }
     }
-
-    character.mesh.visible = true;
-    character.label.visible = true;
-    character.mesh.position.copy(character.pos);
-    character.label.position.copy(character.pos).add(new THREE.Vector3(0, 1, 0));
-    character.label.quaternion.copy(camera.quaternion);
   }
 
-  playerMeshes.blue.position.copy(state.blue.pos);
-  playerMeshes.orange.position.copy(state.orange.pos);
+  drawWorld();
+
+  const drawOrder = [...state.characters, { ...state.blue, type: "player", color: "#5f83ff" }, { ...state.orange, type: "player", color: "#ffa44a" }]
+    .sort((a, b) => a.pos.z - b.pos.z);
+
+  for (const item of drawOrder) {
+    if (item.type === "player") {
+      drawPlayer(item, item.color);
+    } else {
+      drawCharacter(item);
+    }
+  }
 
   nodes.scoreBlue.textContent = String(state.scores.blue);
   nodes.scoreOrange.textContent = String(state.scores.orange);
-
-  const blueCarry = state.characters.find((c) => c.id === state.blue.carry)?.name;
-  const orangeCarry = state.characters.find((c) => c.id === state.orange.carry)?.name;
-  nodes.carryBlue.textContent = blueCarry ?? "None";
-  nodes.carryOrange.textContent = orangeCarry ?? "None";
-
-  renderer.render(scene, camera);
+  nodes.carryBlue.textContent = state.characters.find((c) => c.id === state.blue.carry)?.name ?? "None";
+  nodes.carryOrange.textContent = state.characters.find((c) => c.id === state.orange.carry)?.name ?? "None";
 }
 
-makeWorld();
+function resize() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+
+window.addEventListener("resize", resize);
+window.addEventListener("keydown", (event) => {
+  if (event.repeat) return;
+  keys.add(event.code);
+  if (event.code === CONTROL_MAP.blue.action) attemptGrabOrDrop(state.blue);
+  if (event.code === CONTROL_MAP.orange.action) attemptGrabOrDrop(state.orange);
+});
+window.addEventListener("keyup", (event) => keys.delete(event.code));
+
+resize();
 spawnCharacter();
 spawnCharacter();
-setLog("Blue and Orange can both steal from each other's base.");
-tick(0);
+setLog("Working build loaded: grab runway characters, bank at base, steal from enemy base.");
+requestAnimationFrame(tick);
