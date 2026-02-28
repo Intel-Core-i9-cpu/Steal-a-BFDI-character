@@ -3,27 +3,28 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Steal a BFDI Character - 3D Local Multiplayer</title>
+    <title>Steal a BFDI Character</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <section class="hud">
-      <h1>Steal a BFDI Character (3D Local Multiplayer)</h1>
-      <p class="sub">Those BFDI characters spawn from the tunnel, walk the runway, and can be stolen between bases.</p>
-      <div class="stats">
-        <div><span>Blue Base</span><strong id="scoreBlue">0</strong></div>
-        <div><span>Orange Base</span><strong id="scoreOrange">0</strong></div>
-        <div><span>Blue Carrying</span><strong id="carryBlue">None</strong></div>
-        <div><span>Orange Carrying</span><strong id="carryOrange">None</strong></div>
-      </div>
-      <div class="controls">
-        <strong>Blue:</strong><span>Move WASD</span><span>Grab / Drop E</span>
-        <strong>Orange:</strong><span>Move Arrows</span><span>Grab / Drop M</span>
-      </div>
-      <p id="eventLog">Collect runway characters and bank them at base. You can steal stored characters from the enemy base.</p>
-    </section>
+    <aside class="hud">
+      <h1>Steal a BFDI Character</h1>
+      <p class="subtitle">Local 2-player prototype: runway spawn, grab, bank, and steal.</p>
 
-    <canvas id="gameCanvas"></canvas>
-    <script type="module" src="script.js"></script>
+      <div class="grid">
+        <div><span>Blue Score</span><strong id="blueScore">0</strong></div>
+        <div><span>Orange Score</span><strong id="orangeScore">0</strong></div>
+        <div><span>Blue Carry</span><strong id="blueCarry">None</strong></div>
+        <div><span>Orange Carry</span><strong id="orangeCarry">None</strong></div>
+      </div>
+
+      <p class="controls">
+        Blue: <kbd>WASD</kbd> + <kbd>E</kbd> | Orange: <kbd>Arrows</kbd> + <kbd>M</kbd>
+      </p>
+      <p id="log" class="log">Characters are spawning from the tunnel...</p>
+    </aside>
+
+    <canvas id="game"></canvas>
+    <script src="script.js"></script>
   </body>
 </html>

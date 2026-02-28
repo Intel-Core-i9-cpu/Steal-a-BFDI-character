@@ -1,17 +1,15 @@
 # Steal-a-BFDI-character
 
-A **3D-style local multiplayer starter prototype** inspired by Steal a Brainrot, where **those BFDI characters** spawn from a tunnel and walk a runway.
+Fresh rebuild of a **local 2-player BFDI runway prototype**.
 
-## What's implemented
-- Canvas-rendered pseudo-3D arena with tunnel, runway, and two bases (no external JS dependencies).
-- BFDI characters continuously spawn from the tunnel and walk the runway.
-- Floating stat labels above each character (`SPD` and `VAL`).
-- Local 2-player controls on one screen (blue vs orange).
-- Grab/carry/drop gameplay plus stealing already-stored characters from the enemy base.
+## Current gameplay
+- Characters spawn from a tunnel and walk down a runway.
+- Each character shows stats above them (`SPD` and `VAL`).
+- Blue and Orange players can move, grab, carry, bank at their own base, and steal from the enemy base.
 
 ## Controls
-- **Blue player:** `WASD` to move, `E` to grab/drop/steal.
-- **Orange player:** Arrow keys to move, `M` to grab/drop/steal.
+- **Blue:** `WASD` move, `E` act (grab/drop/steal/bank)
+- **Orange:** Arrow keys move, `M` act (grab/drop/steal/bank)
 
 ## Run locally
 ```bash
@@ -19,13 +17,8 @@ python3 -m http.server 8000 --bind 0.0.0.0
 # open http://localhost:8000
 ```
 
-## Validation checks
+## Quick checks
 ```bash
 node --check script.js
 curl -I http://127.0.0.1:8000
 ```
-
-## Next ideas
-- Upgrade local multiplayer to online netcode with server authority.
-- Replace primitives with unique BFDI character models + animations.
-- Add a timer, match win conditions, and lobby flow.
