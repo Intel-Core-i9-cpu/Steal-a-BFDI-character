@@ -32,7 +32,7 @@ body {
   z-index: 2;
   left: 1rem;
   top: 1rem;
-  width: min(460px, calc(100vw - 2rem));
+  width: min(500px, calc(100vw - 2rem));
   background: var(--panel);
   border: 1px solid var(--line);
   border-radius: 14px;
@@ -86,4 +86,17 @@ h1 {
   margin: 0.65rem 0 0;
   font-size: 0.93rem;
   color: #d5ddff;
+}
+
+@media (max-width: 640px) {
+  .hud {
+    width: calc(100vw - 1rem);
+    left: 0.5rem;
+    top: 0.5rem;
+    padding: 0.75rem;
+  }
+
+  .controls {
+    font-size: 0.82rem;
+  }
 }

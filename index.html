@@ -3,13 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Steal a BFDI Character - 3D Multiplayer Prototype</title>
+    <title>Steal a BFDI Character - 3D Local Multiplayer</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
     <section class="hud">
-      <h1>Steal a BFDI Character (Local 2-Player 3D)</h1>
-      <p class="sub">BFDI characters spawn from the tunnel and walk down the runway.</p>
+      <h1>Steal a BFDI Character (3D Local Multiplayer)</h1>
+      <p class="sub">Those BFDI characters spawn from the tunnel, walk the runway, and can be stolen between bases.</p>
       <div class="stats">
         <div><span>Blue Base</span><strong id="scoreBlue">0</strong></div>
         <div><span>Orange Base</span><strong id="scoreOrange">0</strong></div>
@@ -17,10 +17,10 @@
         <div><span>Orange Carrying</span><strong id="carryOrange">None</strong></div>
       </div>
       <div class="controls">
-        <strong>Blue:</strong><span>Move WASD</span><span>Grab/Drop E</span>
-        <strong>Orange:</strong><span>Move Arrows</span><span>Grab/Drop M</span>
+        <strong>Blue:</strong><span>Move WASD</span><span>Grab / Drop E</span>
+        <strong>Orange:</strong><span>Move Arrows</span><span>Grab / Drop M</span>
       </div>
-      <p id="eventLog">Collect runway characters and bring them to your base. You can steal from the enemy base.</p>
+      <p id="eventLog">Collect runway characters and bank them at base. You can steal stored characters from the enemy base.</p>
     </section>
 
     <canvas id="gameCanvas"></canvas>

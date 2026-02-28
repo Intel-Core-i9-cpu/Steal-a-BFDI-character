@@ -30,6 +30,11 @@ const state = {
 };
 
 const keys = new Set();
+
+const CONTROL_MAP = {
+  blue: { left: ["KeyA"], right: ["KeyD"], up: ["KeyW"], down: ["KeyS"], action: "KeyE" },
+  orange: { left: ["ArrowLeft"], right: ["ArrowRight"], up: ["ArrowUp"], down: ["ArrowDown"], action: "KeyM" }
+};
 const canvas = document.getElementById("gameCanvas");
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -217,8 +222,8 @@ window.addEventListener("keydown", (event) => {
   }
 
   keys.add(event.code);
-  if (event.code === "KeyE") attemptGrabOrDrop(state.blue);
-  if (event.code === "KeyM") attemptGrabOrDrop(state.orange);
+  if (event.code === CONTROL_MAP.blue.action) attemptGrabOrDrop(state.blue);
+  if (event.code === CONTROL_MAP.orange.action) attemptGrabOrDrop(state.orange);
 });
 
 window.addEventListener("keyup", (event) => keys.delete(event.code));
@@ -237,8 +242,8 @@ function tick(now) {
     state.nextSpawnAt = now + 2200;
   }
 
-  handlePlayerMovement(state.blue, { left: ["KeyA"], right: ["KeyD"], up: ["KeyW"], down: ["KeyS"] }, 0.2);
-  handlePlayerMovement(state.orange, { left: ["ArrowLeft"], right: ["ArrowRight"], up: ["ArrowUp"], down: ["ArrowDown"] }, 0.2);
+  handlePlayerMovement(state.blue, CONTROL_MAP.blue, 0.2);
+  handlePlayerMovement(state.orange, CONTROL_MAP.orange, 0.2);
 
   for (const character of state.characters) {
     if (character.carrier) {
