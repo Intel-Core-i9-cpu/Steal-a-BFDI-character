@@ -7,6 +7,26 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
+
+    <aside class="hud">
+      <h1>Steal a BFDI Character</h1>
+      <p class="subtitle">Local 2-player prototype: runway spawn, grab, bank, and steal.</p>
+
+      <div class="grid">
+        <div><span>Blue Score</span><strong id="blueScore">0</strong></div>
+        <div><span>Orange Score</span><strong id="orangeScore">0</strong></div>
+        <div><span>Blue Carry</span><strong id="blueCarry">None</strong></div>
+        <div><span>Orange Carry</span><strong id="orangeCarry">None</strong></div>
+      </div>
+
+      <p class="controls">
+        Blue: <kbd>WASD</kbd> + <kbd>E</kbd> | Orange: <kbd>Arrows</kbd> + <kbd>M</kbd>
+      </p>
+      <p id="log" class="log">Characters are spawning from the tunnel...</p>
+    </aside>
+
+    <canvas id="game"></canvas>
+=======
     <header>
       <h1>Steal a BFDI Character</h1>
       <p>Build your collection, earn cash, and swipe from your rival.</p>
@@ -47,6 +67,7 @@
         <strong class="character-income"></strong>
       </li>
     </template>
+
 
     <script src="script.js"></script>
   </body>
