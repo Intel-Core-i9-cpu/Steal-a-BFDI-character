@@ -1,6 +1,12 @@
 # Steal-a-BFDI-character
 
 
+Fresh rebuild of a **local 2-player BFDI runway prototype** with realtime canvas 3D graphics (projected geometry + dynamic camera).
+
+## Current gameplay
+- Characters spawn from a tunnel and walk down a runway in a perspective 3D scene with animated camera parallax.
+
+
 Fresh rebuild of a **local 2-player BFDI runway prototype** with realtime canvas 3D graphics.
 
 ## Current gameplay
@@ -11,6 +17,7 @@ Fresh rebuild of a **local 2-player BFDI runway prototype**.
 
 ## Current gameplay
 - Characters spawn from a tunnel and walk down a runway.
+
 
 - Each character shows stats above them (`SPD` and `VAL`).
 - Blue and Orange players can move, grab, carry, bank at their own base, and steal from the enemy base.
@@ -30,8 +37,7 @@ python3 -m http.server 8000 --bind 0.0.0.0
 node --check script.js
 curl -I http://127.0.0.1:8000
 ```
-=======
-=======
+
 A starter browser game inspired by **Steal a Brainrot**, but using BFDI characters.
 
 ## Current prototype includes
@@ -57,4 +63,5 @@ or open `index.html` directly in your browser.
 - Add base defense upgrades.
 - Add PvP rounds or online multiplayer.
 - Add rebirth/prestige and progression systems.
+
 

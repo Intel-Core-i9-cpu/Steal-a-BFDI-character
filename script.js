@@ -1,7 +1,4 @@
 
-=======
-
-
 (() => {
   const canvas = document.getElementById("game");
   const ctx = canvas.getContext("2d");
@@ -48,11 +45,29 @@
 
   const camera = {
     x: 0,
+    y: 8.5,
+    z: 24,
+    yaw: 0,
+=======
+
+  const camera = {
+    x: 0,
     y: 8.8,
     z: 24,
+
     pitch: -0.42,
     fov: 520
   };
+
+
+  function shade(hex, amount) {
+    const n = parseInt(hex.slice(1), 16);
+    const r = Math.max(0, Math.min(255, ((n >> 16) & 255) + amount));
+    const g = Math.max(0, Math.min(255, ((n >> 8) & 255) + amount));
+    const b = Math.max(0, Math.min(255, (n & 255) + amount));
+    return `rgb(${r}, ${g}, ${b})`;
+  }
+=======
 
 
   function log(message) {
@@ -75,16 +90,22 @@
       id: Math.random().toString(36).slice(2, 9),
       ...pick,
       x: (Math.random() - 0.5) * 3,
+      y: 0.7,
+=======
 
       y: 0.72,
+
       z: -24,
       carrier: null,
       stored: null,
       bobSeed: Math.random() * Math.PI * 2
 
+=======
+
       z: -24,
       carrier: null,
       stored: null
+
 
     });
   }
@@ -98,11 +119,45 @@
   }
 
 
+=======
+
+
   function project(x, y, z) {
     const dx = x - camera.x;
     const dy = y - camera.y;
     const dz = z - camera.z;
 
+
+    const cy = Math.cos(camera.yaw);
+    const sy = Math.sin(camera.yaw);
+    const yx = dx * cy - dz * sy;
+    const yz = dx * sy + dz * cy;
+
+    const cp = Math.cos(camera.pitch);
+    const sp = Math.sin(camera.pitch);
+    const px = yx;
+    const py = dy * cp - yz * sp;
+    const pz = dy * sp + yz * cp;
+
+    const depth = -pz;
+    if (depth < 0.25) return null;
+    const scale = camera.fov / depth;
+
+    return {
+      x: canvas.width * 0.5 + px * scale,
+      y: canvas.height * 0.57 - py * scale,
+      depth,
+      scale
+    };
+  }
+
+  function drawFace(points3d, fill, stroke = null) {
+    const pts = points3d.map((p) => project(p[0], p[1], p[2]));
+    if (pts.some((p) => !p)) return;
+    ctx.beginPath();
+    ctx.moveTo(pts[0].x, pts[0].y);
+    for (let i = 1; i < pts.length; i += 1) ctx.lineTo(pts[i].x, pts[i].y);
+=======
     const cp = Math.cos(camera.pitch);
     const sp = Math.sin(camera.pitch);
     const ry = dy * cp - dz * sp;
@@ -131,6 +186,7 @@
     ctx.lineTo(b.x, b.y);
     ctx.lineTo(c.x, c.y);
     ctx.lineTo(d.x, d.y);
+>
     ctx.closePath();
     ctx.fillStyle = fill;
     ctx.fill();
@@ -140,6 +196,25 @@
     }
   }
 
+  function drawPrism(centerX, centerZ, width, depth, height, color) {
+    const x1 = centerX - width / 2;
+    const x2 = centerX + width / 2;
+    const z1 = centerZ - depth / 2;
+    const z2 = centerZ + depth / 2;
+    const y0 = 0;
+    const y1 = height;
+
+    const top = [[x1, y1, z1], [x2, y1, z1], [x2, y1, z2], [x1, y1, z2]];
+    const sideA = [[x2, y0, z1], [x2, y1, z1], [x2, y1, z2], [x2, y0, z2]];
+    const sideB = [[x1, y0, z2], [x2, y0, z2], [x2, y1, z2], [x1, y1, z2]];
+
+    drawFace(sideA, shade(color, -28));
+    drawFace(sideB, shade(color, -12));
+    drawFace(top, shade(color, 30), "rgba(255,255,255,0.15)");
+  }
+
+  function drawArena(now) {
+=======
   function drawTunnel() {
     for (let i = 0; i < 10; i += 1) {
       const z = -28 + i * 0.9;
@@ -159,12 +234,39 @@
   }
 
   function drawArena() {
+
     const sky = ctx.createLinearGradient(0, 0, 0, canvas.height);
     sky.addColorStop(0, "#1f2f6a");
     sky.addColorStop(1, "#090e1f");
     ctx.fillStyle = sky;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+
+    drawFace([[-32, 0, -44], [32, 0, -44], [32, 0, 32], [-32, 0, 32]], "#111938");
+    drawFace([[-3.8, 0.01, -28], [3.8, 0.01, -28], [5.7, 0.01, 24], [-5.7, 0.01, 24]], "#2d365f", "rgba(152,170,255,0.25)");
+
+    for (let i = 0; i < 16; i += 1) {
+      const z = -27 + i * 3.15;
+      drawFace([[-0.08, 0.02, z], [0.08, 0.02, z], [0.16, 0.02, z + 1], [-0.16, 0.02, z + 1]], "rgba(225,236,255,0.35)");
+    }
+
+    // tunnel rings with animated shimmer
+    for (let i = 0; i < 13; i += 1) {
+      const z = -29 + i * 0.8;
+      const h = 2.2 + Math.sin(now * 0.002 + i) * 0.08;
+      const w = 2.2;
+      const left = project(-w, h, z);
+      const top = project(0, h + 1.1, z);
+      const right = project(w, h, z);
+      if (!left || !top || !right) continue;
+      ctx.strokeStyle = `rgba(190,205,255,${0.12 + i * 0.03})`;
+      ctx.lineWidth = Math.max(1, left.scale * 0.03);
+      ctx.beginPath();
+      ctx.moveTo(left.x, left.y);
+      ctx.quadraticCurveTo(top.x, top.y, right.x, right.y);
+      ctx.stroke();
+    }
+=======
     drawQuad([-28, 0, -40], [28, 0, -40], [28, 0, 30], [-28, 0, 30], "#111938");
     drawQuad([-3.8, 0.01, -28], [3.8, 0.01, -28], [5.6, 0.01, 24], [-5.6, 0.01, 24], "#2d365f", "rgba(152,170,255,0.2)");
 
@@ -211,10 +313,40 @@
     ctx.ellipse(canvas.width / 2, 88, 88, 42, 0, Math.PI, 2 * Math.PI);
     ctx.fill();
 
+
   }
 
   function drawBase(team) {
     const b = base[team];
+
+    drawPrism(b.x, b.z, 3.3, 3.3, 0.35, b.color);
+
+    const label = project(b.x, 1.05, b.z + 1.6);
+    if (label) {
+      ctx.fillStyle = "#ecf2ff";
+      ctx.font = `${Math.max(10, label.scale * 0.2)}px sans-serif`;
+      ctx.textAlign = "center";
+      ctx.fillText(`${team.toUpperCase()} BASE`, label.x, label.y);
+    }
+  }
+
+  function drawPlayer(player) {
+    drawPrism(player.x, player.z, 0.8, 0.8, 1.2, player.color);
+    drawPrism(player.x, player.z, 0.5, 0.5, 1.7, shade(player.color, 18));
+  }
+
+  function drawChar(c, now) {
+    const bobY = c.y + Math.sin(now * 0.004 + c.bobSeed) * 0.1;
+
+    drawPrism(c.x, c.z, 0.52, 0.52, bobY + 0.45, c.color);
+    const tag = project(c.x, bobY + 0.85, c.z);
+    if (tag) {
+      ctx.fillStyle = "#ecf2ff";
+      ctx.textAlign = "center";
+      ctx.font = `${Math.max(10, tag.scale * 0.16)}px sans-serif`;
+      ctx.fillText(`${c.name} SPD:${Math.round(c.speed * 10)} VAL:${c.value}`, tag.x, tag.y);
+    }
+=======
 
     const p = project(b.x, 0.35, b.z);
     if (!p) return;
@@ -307,6 +439,7 @@
     ctx.arc(p.sx, p.sy - 16 * p.scale, 12 * p.scale, 0, Math.PI * 2);
     ctx.fill();
 
+
   }
 
   function handleMovement(player, map) {
@@ -376,6 +509,13 @@
   function tick(now) {
     requestAnimationFrame(tick);
 
+
+    // subtle camera pan so perspective motion is obvious
+    camera.yaw = Math.sin(now * 0.00045) * 0.13;
+    camera.x = Math.sin(now * 0.00035) * 1.2;
+
+=======
+
     if (now > state.spawnAt && state.chars.length < 30) {
       spawnChar();
       state.spawnAt = now + 2100;
@@ -399,7 +539,11 @@
       }
     }
 
+
+    drawArena(now);
+=======
     drawArena();
+
     drawBase("blue");
     drawBase("orange");
 
@@ -410,6 +554,9 @@
     ].sort((a, b) => a.z - b.z);
 
     for (const d of drawables) {
+
+      if (d.kind === "char") drawChar(d.ref, now);
+=======
 
       if (d.kind === "char") drawChar(d.ref, now);
 
@@ -438,6 +585,10 @@
   resize();
   spawnChar();
   spawnChar();
+  log("3D graphics loaded: box geometry + dynamic camera perspective.");
+  requestAnimationFrame(tick);
+})();
+=======
 
   log("3D graphics loaded. Grab, bank, and steal characters.");
   requestAnimationFrame(tick);
@@ -618,5 +769,6 @@ setInterval(refreshUi, 300);
 
 seedGame();
 refreshUi();
+
 
 

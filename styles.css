@@ -1,13 +1,11 @@
 :root {
 
-
-
-
   --bg: #0b1024;
   --panel: rgba(15, 22, 51, 0.88);
   --line: rgba(149, 175, 255, 0.4);
   --text: #edf2ff;
   --muted: #aeb8de;
+
 
 
   --bg: #12172b;
@@ -17,6 +15,7 @@
   --muted: #a8afcf;
   --danger: #ff7b8f;
   --good: #6aff9d;
+
 
 
 }
@@ -227,6 +226,7 @@ button:disabled {
 
 .log-bad {
   color: var(--danger);
+
 
 
 }
