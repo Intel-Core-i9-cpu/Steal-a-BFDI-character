@@ -1,8 +1,24 @@
 # Steal-a-BFDI-character
-This is a game like Steal A Brainrot
-but it is not with any trace of brainrots
-it is filled with BFDI (Battle For Dream Island) characters!
-Get them.
-Steal them.
-Make money.
-Steal A BFDI Character!
+
+Fresh rebuild of a **local 2-player BFDI runway prototype** with realtime canvas 3D graphics (projected geometry + dynamic camera).
+
+## Current gameplay
+- Characters spawn from a tunnel and walk down a runway in a perspective 3D scene with animated camera parallax.
+- Each character shows stats above them (`SPD` and `VAL`).
+- Blue and Orange players can move, grab, carry, bank at their own base, and steal from the enemy base.
+
+## Controls
+- **Blue:** `WASD` move, `E` act (grab/drop/steal/bank)
+- **Orange:** Arrow keys move, `M` act (grab/drop/steal/bank)
+
+## Run locally
+```bash
+python3 -m http.server 8000 --bind 0.0.0.0
+# open http://localhost:8000
+```
+
+## Quick checks
+```bash
+node --check script.js
+curl -I http://127.0.0.1:8000
+```
